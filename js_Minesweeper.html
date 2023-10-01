@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>fill</title>
+    <style>
+      table {
+        border: 3px solid black;
+        margin-top: 20px;
+      }
+
+      thead td {
+        height: 35px;
+      }
+
+      td,
+      th {
+        width: 25px;
+        height: 25px;
+        background-color: rgb(209, 209, 209);
+        text-align: center;
+        box-shadow: inset 2px 2px darkgray;
+        font-size: 0;
+      }
+
+      .open {
+        font-size: 16px;
+        background-color: rgb(200, 215, 215);
+        box-shadow: none;
+      }
+
+      .bomb {
+        font-weight: bolder;
+      }
+
+      .explosion {
+        background-color: red;
+      }
+
+      .flag {
+        box-sizing: border-box;
+        border: 3px dotted seagreen;
+      }
+
+      .number {
+        font-weight: bold;
+      }
+
+      .text1 {
+        color: blue;
+      }
+
+      .text2 {
+        color: cadetblue;
+      }
+
+      .text3 {
+        color: darkgoldenrod;
+      }
+
+      .text4 {
+        color: brown;
+      }
+
+      .text5 {
+        color: blueviolet;
+      }
+
+      .text6 {
+        color: green;
+      }
+
+      .text7 {
+        color: yellow;
+      }
+
+      .text8 {
+        color: crimson;
+      }
+    </style>
+  </head>
+
+  <body>
+    <table>
+      <thead>
+        <tr>
+          <th colspan="9"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <script>
+      let tds = document.querySelectorAll("td");
+      for (let td of tds) {
+        td.addEventListener("click", open);
+        td.addEventListener("mousedown", (e) => {
+          setFlag(e);
+        });
+      }
+      document.querySelector("table").addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+      });
+
+      function createArr(row, column) {
+        let arr = [];
+        for (i = 0; i < row * column; i++) {
+          arr.push(i);
+        }
+        return arr;
+      }
+
+      function createTable(row, column) {}
+
+      function createBomb(row, column, bomb) {
+        let arr = createArr(row, column);
+        let total = row * column;
+        let table = document.querySelector("tbody");
+        for (i = 0; i < bomb; i++) {
+          let random = Math.floor(Math.random() * (total - i));
+          let v = arr[random];
+          table.children[Math.floor(v / column)].children[
+            v % column
+          ].classList.add("bomb");
+          arr.splice(random, 1);
+        }
+      }
+      createBomb(12, 9, 10);
+
+      function fillNumber() {
+        let bombs = document.querySelectorAll(".bomb");
+        console.log(
+          Array.prototype.indexOf.call(
+            bombs[0].parentElement.children,
+            bombs[0]
+          )
+        );
+        for (bomb of bombs) {
+          bomb.innerHTML = "★";
+          allElements = get_8_Elements(bomb);
+          for (ele of allElements) {
+            if (ele != null && !ele.classList.contains("bomb")) {
+              if (ele.innerHTML == "") {
+                ele.innerHTML = 0;
+              }
+              ele.innerHTML = parseInt(ele.innerHTML) + 1;
+              if (!ele.classList.contains("number")) {
+                ele.classList.add("number");
+              }
+            }
+          }
+        }
+      }
+      fillNumber();
+
+      function changeNumColor() {
+        let nums = document.getElementsByClassName("number");
+        for (num of nums) {
+          switch (parseInt(num.innerHTML)) {
+            case 1:
+              num.classList.add("text1");
+              break;
+            case 2:
+              num.classList.add("text2");
+              break;
+            case 3:
+              num.classList.add("text3");
+              break;
+            case 4:
+              num.classList.add("text4");
+              break;
+            case 5:
+              num.classList.add("text5");
+              break;
+            case 6:
+              num.classList.add("text6");
+              break;
+            case 7:
+              num.classList.add("text7");
+              break;
+            default:
+              num.classList.add("text7");
+              break;
+          }
+        }
+      }
+      changeNumColor();
+
+      function get_8_Elements(e) {
+        let i = Array.prototype.indexOf.call(e.parentElement.children, e);
+        let pfp =
+          e.parentElement.previousElementSibling != null
+            ? e.parentElement.previousElementSibling.children[i]
+                .previousElementSibling
+            : null;
+        let pf =
+          e.parentElement.previousElementSibling != null
+            ? e.parentElement.previousElementSibling.children[i]
+            : null;
+        let pfn =
+          e.parentElement.previousElementSibling != null
+            ? e.parentElement.previousElementSibling.children[i]
+                .nextElementSibling
+            : null;
+        let p = e.previousElementSibling;
+        let n = e.nextElementSibling;
+        let nfp =
+          e.parentElement.nextElementSibling != null
+            ? e.parentElement.nextElementSibling.children[i]
+                .previousElementSibling
+            : null;
+        let nf =
+          e.parentElement.nextElementSibling != null
+            ? e.parentElement.nextElementSibling.children[i]
+            : null;
+        let nfn =
+          e.parentElement.nextElementSibling != null
+            ? e.parentElement.nextElementSibling.children[i].nextElementSibling
+            : null;
+        return [pfp, pf, pfn, p, n, nfp, nf, nfn];
+      }
+
+      function open() {
+        this.classList.add("open");
+        this.removeEventListener("click", open);
+        console.log(this.classList);
+        if (this.classList.contains("bomb")) {
+          let bombs = document.querySelectorAll(".bomb");
+          for (let bomb of bombs) {
+            bomb.classList.add("explosion");
+            bomb.classList.add("open");
+          }
+          for (let td of tds) {
+            td.removeEventListener("click", open);
+          }
+          alert("你輸了");
+          return;
+        } else if (this.classList.contains("number")) {
+        } else {
+          let eles = get_8_Elements(this);
+          for (let ele of eles) {
+            if (ele != null && !ele.classList.contains("bomb")) {
+              ele.click();
+            }
+          }
+        }
+        WinOrNot(12, 9, 10);
+      }
+
+      function setFlag(event) {
+        let ele = event.target;
+        if (event.button == 2) {
+          if (ele.classList.contains("flag")) {
+            ele.classList.remove("flag");
+            ele.addEventListener("click", open);
+          } else {
+            ele.classList.add("flag");
+            ele.removeEventListener("click", open);
+          }
+        }
+      }
+      function WinOrNot(row, column, bomb) {
+        if (document.querySelectorAll(".open").length == row * column - bomb) {
+          let bombs = document.querySelectorAll(".bomb");
+          for (let bomb of bombs) {
+            bomb.classList.add("flag");
+            bomb.removeEventListener("click", open);
+          }
+          alert("成功拆雷!!!");
+        }
+      }
+    </script>
+  </body>
+</html>
