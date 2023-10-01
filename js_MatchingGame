@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>翻牌</title>
+    <style>
+        .container {
+            margin: 0 auto;
+            width: 900px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border: 2px solid black;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+            margin: 2px;
+
+        }
+
+        .card-img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            font-size: 0px;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: cadetblue;
+            transform: translateZ(1px);
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .open {
+            transition: transform 1s;
+            transform: rotateY(-180deg);
+        }
+
+        .temp {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 85px;
+            font-weight: bold;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+    </div>
+
+
+
+    <template id="cardTemplate">
+        <div class="card">
+            <div class="card-back"></div>
+            <div class="card-img">
+                <img src="" alt="">
+            </div>
+        </div>
+    </template>
+    <script>
+        const data = [
+            { name: "", img: "https://1.bp.blogspot.com/-7iXiVjHj8MI/XTVpR2RlxiI/AAAAAAABT2k/9fNWh-dYk3cocH3pP_fUK8nIzmaEo832gCLcBGAs/s400/bird_niwatori_chabo.png" },
+            { name: "", img: "https://1.bp.blogspot.com/-w83FenzaQSc/WKJC0iecaBI/AAAAAAABBxg/cNg8qP3PkxUn1swVQybymhE0JVrjEhKpgCLcB/s400/animal_serval.png" },
+            { name: "", img: "https://4.bp.blogspot.com/-oQWBWzjdCPA/VY4WVzhQLyI/AAAAAAAAuo4/bx_MTb61lyY/s400/animal_okojo.png" },
+            { name: "", img: "https://4.bp.blogspot.com/-fsd5sTJYdLg/VE9gZjJCgbI/AAAAAAAAoqA/2r2Gb1u3eGA/s1600/animal_marmot.png" },
+            { name: "", img: "https://2.bp.blogspot.com/-69SFw3YBHfI/VA7mKHuz7HI/AAAAAAAAmLs/Cy5fKfWq3co/s500/animal_yukihyou.png" },
+            { name: "", img: "https://2.bp.blogspot.com/-ClApFOtLP-Q/U32NinH0JMI/AAAAAAAAgxM/TAyJSDL9UJY/s400/animal_penguin_baby.png" },
+            { name: "", img: "https://4.bp.blogspot.com/-zbIelW8s9qQ/Wj2--nqMRiI/AAAAAAABI3c/Uia5jY4JeLkYvd4ec11RaTbhJwwA3vLtQCLcBGAs/s400/animal_shirokuma_hokkyokuguma.png" },
+            { name: "", img: "https://3.bp.blogspot.com/-jVMOK5npdfA/UrlnCS1GgcI/AAAAAAAAcMg/gYi2ds6jjCA/s400/animal_kitsune_white.png" },
+            { name: "", img: "https://4.bp.blogspot.com/-GHOTAx9T2UQ/Udy6To8bQLI/AAAAAAAAWCk/G1kF4dQW1_A/s400/animal_fennec.png" },
+            { name: "", img: "https://2.bp.blogspot.com/-wTsiAvl2VKM/W-VEZy23dkI/AAAAAAABQFM/gFR81oy-yo0O6IxCVyvmZatHmUf3NedYgCLcBGAs/s400/animal_gomafu_azarashi_baby.png" },
+            { name: "", img: "https://2.bp.blogspot.com/-bTO-CzLabL4/UaVVAUOvdKI/AAAAAAAAT-E/rweSONZMmB4/s400/animal_usagi_ninjin.png" },
+            { name: "", img: "https://1.bp.blogspot.com/-Ve_0j2nFf-4/UZB6SPk6rtI/AAAAAAAASAU/aaEnFHN4Coc/s400/animal_syachi.png" },
+            { name: "", img: "https://1.bp.blogspot.com/-FYWRJSiVIgI/UQuSUjfog0I/AAAAAAAALvE/-ZlEQ4pAnZk/s300/shoes_32.png" },
+            { name: "", img: "https://1.bp.blogspot.com/-Y-An3KpCKKc/UReRtV2Vd_I/AAAAAAAAMSs/P9HsbFZ3IH4/s400/capybara.png" },
+            { name: "", img: "https://1.bp.blogspot.com/-xihtSBkTelA/YMVaXFmp71I/AAAAAAABd4E/XnKUTf9qc9EsC68ovza2txUtI19N19NNQCNcBGAsYHQ/s450/animal_lion.png" },
+            { name: "", img: "https://1.bp.blogspot.com/-RBC_bGwqpvI/XxU0TIOZRCI/AAAAAAABaI8/jEsW5rFvJP4OuXpPfVeYT5jf3rlgy_26wCNcBGAsYHQ/s400/animal_oomimigitsune.png" },
+            { name: "", img: "https://2.bp.blogspot.com/-R_dVQn4AnOs/XKWRAw8aRhI/AAAAAAABSNQ/Yr4937EYyXggB6XIMHH1V2XzuezQwBTmQCLcBGAs/s450/animal_araiguma_side.png" },
+            { name: "", img: "https://3.bp.blogspot.com/-OJvoWxkTTB8/XGjx8Xq6uFI/AAAAAAABRdA/g9vIX6kCQH8IO-y1neLRRm39TaTc_nVDQCLcBGAs/s400/animal_gomafu_azarashi.png" },
+            { name: "", img: "https://2.bp.blogspot.com/-3F_IwMqlwqw/WyeOyhtnczI/AAAAAAABMz8/IZqg_8tOhQQELSxPvLp_MbGkAjD9dBKCgCLcBGAs/s400/animal_kawauso_juggling.png" },
+            { name: "", img: "https://1.bp.blogspot.com/-B5glTim5bw8/Xlyfi1LKATI/AAAAAAABXmQ/ssR-v0QH2nk1K-QJhbRJMCt3BXWROP5DACNcBGAsYHQ/s400/bird_shima_fukurou.png" },
+            { name: "", img: "https://4.bp.blogspot.com/-c5IMtonhFAs/WLjrRHfvvbI/AAAAAAABCUY/qFdZU0RILpQgaKRGeHV0MNShq4-DkoUcACLcB/s400/speed_slow_turtle.png" },
+            { name: "", img: "https://1.bp.blogspot.com/-VRb0CqTiPc4/VMIthbA-mJI/AAAAAAAAqu0/9uy05Xg4l_0/s400/kaeru5_seitai.png" }
+        ];
+
+
+        let cardCount = 16;
+        function createCard(count) {
+            let container = document.querySelector(".container");
+            let cards = [];
+            let template = document.getElementById("cardTemplate");
+            let dataClone = data;
+            for (let i = 0; i < count / 2; i++) {
+                let r = Math.floor(Math.random() * (dataClone.length))
+                template.content.querySelector("img").src = dataClone[r].img;
+                dataClone.splice(r, 1);
+                template.content.querySelector(".card-back").textContent = i;
+                let clone = template.content.cloneNode(true);
+                let clone2 = template.content.cloneNode(true);
+                cards.push(clone);
+                cards.push(clone2);
+            }
+
+            for (let i = 0; i < count; i++) {
+                let r = Math.floor(Math.random() * (count - i))
+                container.append(cards[r])
+                cards.splice(r, 1);
+            }
+        }
+        createCard(cardCount);
+
+        let cards = document.querySelectorAll(".card");
+        for (let card of cards) {
+            card.addEventListener("click", open);
+        }
+
+
+        let turn = false;
+        let ele = "";
+        function open() {
+            this.classList.toggle("open");
+            this.removeEventListener("click", open);
+            let e = this;
+            setTimeout(function () { compare(e); }, 500);
+        }
+        function compare(e) {
+            if (!turn) {
+                turn = true;
+                ele = e;
+            }
+            else {
+                turn = false;
+                if (e.querySelector(".card-back").innerHTML == ele.querySelector(".card-back").innerHTML) {
+                    console.log("correct");
+                }
+                else {
+                    e.addEventListener("click", open);
+                    ele.addEventListener("click", open);
+                    e.classList.toggle("open")
+                    ele.classList.toggle("open");
+                }
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>
