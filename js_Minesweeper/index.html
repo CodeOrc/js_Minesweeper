@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>踩地雷</title>
     <style>
+      .setting {
+        width: 45px;
+      }
+
       table {
         border: 3px solid black;
         margin-top: 20px;
@@ -82,160 +86,97 @@
   </head>
 
   <body>
+    <label for="rowNum">列數: </label>
+    <input
+      class="setting"
+      type="number"
+      name="rowNum"
+      id="rowNum"
+      value="12"
+      max="30"
+      min="10"
+    />
+    <label for="rowNum">行數: </label
+    ><input
+      class="setting"
+      type="number"
+      name="colNum"
+      id="colNum"
+      value="9"
+      max="30"
+      min="10"
+    />
+    <label for="rowNum">炸彈: </label
+    ><input
+      class="setting"
+      type="number"
+      name="bombNum"
+      id="bombNum"
+      value="10"
+    />
+    <button id="resetBtn">重置</button>
     <table>
       <thead>
         <tr>
-          <th colspan="9"></th>
+          <th id="mainTh" colspan="9"></th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      </tbody>
+      <tbody id="tBody"></tbody>
     </table>
 
     <script>
-      let tds = document.querySelectorAll("td");
-      for (let td of tds) {
-        td.addEventListener("click", open);
-        td.addEventListener("mousedown", (e) => {
-          setFlag(e);
-        });
-      }
+      let row = 12;
+      let column = 9;
+      let bombs = 10;
+      let resetBtn = document.querySelector("#resetBtn");
+      let tbody = document.querySelector("#tBody");
+      resetBtn.addEventListener("click", createTable);
       document.querySelector("table").addEventListener("contextmenu", (e) => {
         e.preventDefault();
       });
 
+      //-------產生table-------
+      function createTable() {
+        row = document.querySelector("#rowNum").value;
+        column = document.querySelector("#colNum").value;
+        bombs = document.querySelector("#bombNum").value;
+
+        if (bombs > Math.floor(row * column * 0.7)) {
+          document.querySelector("#bombNum").value = Math.floor(
+            row * column * 0.7
+          );
+          alert("炸彈數設置超過上限");
+          return;
+        } else if (row > 30 || row < 10) {
+          alert("列數設置超出範圍");
+          return;
+        } else if (column > 30 || column < 9) {
+          alert("欄數設置超出範圍");
+          return;
+        }
+
+        document.querySelector("#mainTh").colSpan = column;
+        tbody.innerHTML = "";
+        for (let i = 0; i < row; i++) {
+          let tr = document.createElement("tr");
+          for (let j = 0; j < column; j++) {
+            const td = document.createElement("td");
+            tr.append(td);
+          }
+          tbody.append(tr);
+        }
+        createBomb(row, column, bombs);
+        fillNumber();
+        changeNumColor();
+        let tds = document.querySelectorAll("td");
+        for (let td of tds) {
+          td.addEventListener("click", open);
+          td.addEventListener("mousedown", setFlag);
+        }
+      }
+      createTable();
+
+      //-------輔助產生陣列，挑隨機數字用-------
       function createArr(row, column) {
         let arr = [];
         for (i = 0; i < row * column; i++) {
@@ -243,9 +184,7 @@
         }
         return arr;
       }
-
-      function createTable(row, column) {}
-
+      //-------產生隨機bomb-------
       function createBomb(row, column, bomb) {
         let arr = createArr(row, column);
         let total = row * column;
@@ -259,16 +198,16 @@
           arr.splice(random, 1);
         }
       }
-      createBomb(12, 9, 10);
 
+      //-------在bomb周圍填數目-------
       function fillNumber() {
         let bombs = document.querySelectorAll(".bomb");
-        console.log(
-          Array.prototype.indexOf.call(
-            bombs[0].parentElement.children,
-            bombs[0]
-          )
-        );
+        // console.log(
+        //   Array.prototype.indexOf.call(
+        //     bombs[0].parentElement.children,
+        //     bombs[0]
+        //   )
+        // );
         for (bomb of bombs) {
           bomb.innerHTML = "★";
           allElements = get_8_Elements(bomb);
@@ -285,8 +224,8 @@
           }
         }
       }
-      fillNumber();
 
+      //-------依不同數字給予顏色-------
       function changeNumColor() {
         let nums = document.getElementsByClassName("number");
         for (num of nums) {
@@ -318,8 +257,8 @@
           }
         }
       }
-      changeNumColor();
 
+      //-------用以回傳觸發點擊事件元素，周圍八個元素，以利後續檢驗-------
       function get_8_Elements(e) {
         let i = Array.prototype.indexOf.call(e.parentElement.children, e);
         let pfp =
@@ -354,18 +293,22 @@
         return [pfp, pf, pfn, p, n, nfp, nf, nfn];
       }
 
+      //-------翻開判斷-------
       function open() {
         this.classList.add("open");
         this.removeEventListener("click", open);
-        console.log(this.classList);
+        this.removeEventListener("mousedown", setFlag);
+        //console.log(this.classList);
         if (this.classList.contains("bomb")) {
           let bombs = document.querySelectorAll(".bomb");
           for (let bomb of bombs) {
             bomb.classList.add("explosion");
             bomb.classList.add("open");
           }
+          let tds = document.querySelectorAll("td");
           for (let td of tds) {
             td.removeEventListener("click", open);
+            td.removeEventListener("mousedown", setFlag);
           }
           alert("你輸了");
           return;
@@ -373,16 +316,22 @@
         } else {
           let eles = get_8_Elements(this);
           for (let ele of eles) {
-            if (ele != null && !ele.classList.contains("bomb")) {
+            if (
+              ele != null &&
+              !ele.classList.contains("bomb") &&
+              !ele.classList.contains("open")
+            ) {
               ele.click();
             }
           }
         }
-        WinOrNot(12, 9, 10);
+        WinOrNot(row, column, bombs);
       }
 
+      //-------設置旗子-------
       function setFlag(event) {
         let ele = event.target;
+        //-------mousedown事件的button為2 → 右鍵點擊-------
         if (event.button == 2) {
           if (ele.classList.contains("flag")) {
             ele.classList.remove("flag");
@@ -393,12 +342,15 @@
           }
         }
       }
+
+      //-------判斷是否結束
       function WinOrNot(row, column, bomb) {
         if (document.querySelectorAll(".open").length == row * column - bomb) {
           let bombs = document.querySelectorAll(".bomb");
           for (let bomb of bombs) {
             bomb.classList.add("flag");
             bomb.removeEventListener("click", open);
+            bomb.removeEventListener("mousedown", setFlag);
           }
           alert("成功拆雷!!!");
         }
