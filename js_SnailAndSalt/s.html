@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>使用getBoundingClientRect()方法，做出普通的碰撞箱(HitBox)</title>
+    <style>
+      body {
+        background-color: grey;
+      }
+
+      .remind {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 5px;
+        padding: 6px 10px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: bolder;
+        width: 150px;
+        height: 80px;
+        position: fixed;
+        top: 5px;
+        background-color: rgb(211, 198, 182);
+        border: 3px dotted black;
+        border-radius: 25px;
+      }
+
+      .space {
+        overflow: hidden;
+        position: relative;
+        margin: 0 auto;
+        margin-top: 25px;
+        width: 800px;
+        height: 700px;
+        background-color: rgb(145, 200, 155);
+        border: 15px double black;
+      }
+
+      .space img {
+        width: 100%;
+        height: 100%;
+      }
+
+      .snail,
+      .salt,
+      .water {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+      }
+
+      .snail {
+        display: flex;
+        justify-content: center;
+        transition: 0.1s;
+      }
+
+      .speak-bubble {
+        width: max-content;
+        max-width: 200px;
+        text-align: center;
+        font-weight: bolder;
+        position: absolute;
+        bottom: 50px;
+        padding: 5px;
+        background-color: white;
+        transition: 1s;
+        border: 1px solid black;
+        border-radius: 5px;
+        display: none;
+        opacity: 0;
+      }
+
+      .salt {
+        transition: 0.1s;
+        width: 100px;
+        height: 100px;
+        top: 200px;
+        left: 150px;
+      }
+
+      .health-bar-border {
+        margin: 20px auto;
+        margin-top: 50px;
+        width: 500px;
+        height: 30px;
+        background-color: brown;
+        border: 3px solid black;
+      }
+
+      .health-bar {
+        width: 500px;
+        height: 30px;
+        background-color: green;
+        transition: 0.5s;
+      }
+
+      .get-hurt {
+        filter: invert(80%);
+      }
+
+      .get-heal {
+        filter: brightness(150%);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="health-bar-border">
+      <div class="health-bar"></div>
+    </div>
+
+    <div class="space">
+      <!-- <div class="salt"><img
+                src="https://4.bp.blogspot.com/-cBkhcBcVRXg/U7O8PsHoT5I/AAAAAAAAicc/RFQyyU5gqV8/s400/salt.png" alt="鹽">
+        </div> -->
+    </div>
+    <div class="remind">
+      使用W、S、A、D<br />或 "方向鍵" 移動<br />使用 "z" 加速前進
+    </div>
+    <script>
+      //紀錄那些鍵被按下
+      let keyW = false;
+      let keyA = false;
+      let keyS = false;
+      let keyD = false;
+      let keyZ = false;
+      let space = document.querySelector(".space");
+      let healthBar = document.querySelector(".health-bar");
+      let salts = [];
+      let snail = new snailObj(100, 100, 500);
+
+      // snail.getHurt(-100);
+      // snail.speak("Hello");
+      let start = setInterval(function () {
+        checkMove();
+        saltsMove();
+      }, 100); //每0.1秒執行移動
+      let createSalt = setInterval(radomSalt, 500);
+      let createWater = setInterval(radomWater, 16000); //每16秒隨機產生water
+      radomWater();
+      //======================================================================================================================================================
+
+      let check = setInterval(function () {
+        checkBump();
+        saltsClear();
+      }, 400);
+
+      function checkBump() {
+        if (snail != null) {
+          let snailBox = snail.elem.getBoundingClientRect();
+          let water = document.querySelector(".water");
+          if (salts.length > 0) {
+            for (const i in salts) {
+              let saltBox = salts[i].elem.getBoundingClientRect();
+              if (
+                saltBox.left < snailBox.right &&
+                snailBox.left < saltBox.right &&
+                saltBox.top < snailBox.bottom &&
+                snailBox.top < saltBox.bottom
+              ) {
+                snail.getHurt(-50);
+                snail.speak("Ouch!!!");
+                salts[i].elem.remove();
+                salts.splice(i, 1);
+                return;
+              }
+            }
+          }
+          if (water != null) {
+            let waterBox = water.getBoundingClientRect();
+            if (
+              waterBox.left < snailBox.right &&
+              snailBox.left < waterBox.right &&
+              waterBox.top < snailBox.bottom &&
+              snailBox.top < waterBox.bottom
+            ) {
+              snail.getHurt(100);
+              snail.speak("Feel better");
+              water.remove();
+            }
+          }
+          if (snail.health < 0) {
+            snail.elem.remove();
+            snail = null;
+            clearInterval(start);
+            clearInterval(check);
+            clearInterval(createWater);
+            clearInterval(createSalt);
+          }
+        }
+      }
+
+      //======================================================================================================================================================
+
+      //snail物件函式
+      function snailObj(x, y, health) {
+        //建構snail的div
+        const div = document.createElement("div");
+        const div2 = document.createElement("div");
+        div2.classList.add("speak-bubble");
+        const img = document.createElement("img");
+        img.src =
+          "https://1.bp.blogspot.com/-ckBkx5HtI3U/V2ubPHVNPjI/AAAAAAAA7m4/0q9Z0KORVVMF8OZ7fjMs1DBeYJMH5UDRACLcB/s400/bug_character_katatsumuri.png";
+        div.append(div2);
+        div.append(img);
+        div.classList.add("snail");
+        div.style.left = x + "px";
+        div.style.top = y + "px";
+        space.append(div);
+
+        //定義snail的每個物件屬性及方法
+        this.elem = div; //snail物件的elem屬性，儲存.snail的div的參照
+        this.img = img;
+        this.speakBubble = div2;
+        this.speaking;
+        this.speed = 10;
+        this.x = x;
+        this.y = y;
+        this.health = health;
+
+        //snail橫軸移動的方法
+        this.moveX = (speed) => {
+          //根據傳入speed的正負值決定轉向
+          if (speed > 0) {
+            this.img.style.transform = "rotateY(180deg)";
+          } else {
+            this.img.style.transform = "rotateY(0deg)";
+          }
+          this.x += speed;
+          //避免離開space
+          if (this.x < 0) {
+            this.x = 0;
+          }
+          if (this.x > 750) {
+            this.x = 750;
+          }
+          this.elem.style.left = this.x + "px";
+        };
+        //snail豎軸移動的方法
+        this.moveY = (speed) => {
+          this.y += speed;
+          if (this.y < 0) {
+            this.y = 0;
+          }
+          if (this.y > 650) {
+            this.y = 650;
+          }
+          this.elem.style.top = this.y + "px";
+        };
+        //snail影響healthbar的方法
+        this.getHurt = (dmg) => {
+          this.health += dmg;
+          let type = dmg > 0 ? "get-heal" : "get-hurt";
+          this.health = this.health > 500 ? 500 : this.health;
+          healthBar.style.width = this.health + "px";
+          this.health = this.health <= 0 ? -1 : this.health;
+          setTimeout(() => {
+            this.elem.classList.toggle(type);
+          }, 100);
+          setTimeout(() => {
+            this.elem.classList.toggle(type);
+          }, 200);
+        };
+        //snail彈出對話框的方法
+        this.speak = (text) => {
+          clearTimeout(this.speaking);
+          this.speakBubble.innerHTML = text;
+          this.speakBubble.style.display = "block";
+          this.speakBubble.style.opacity = 1;
+          this.speaking = setTimeout(() => {
+            this.speakBubble.style.opacity = 0;
+            setTimeout(() => {
+              this.speakBubble.innerHTML = "";
+              this.speakBubble.style.display = "none";
+            }, 300);
+          }, 1000);
+        };
+      }
+
+      document.body.addEventListener("keydown", setKeyTrue);
+      document.body.addEventListener("keyup", setKeyFalse);
+
+      //監聽按鍵按下事件
+      function setKeyTrue(e) {
+        // console.log(e.code);
+        switch (e.code) {
+          case "KeyA":
+          case "ArrowLeft":
+            if (!keyA) keyA = true;
+            break;
+          case "KeyW":
+          case "ArrowUp":
+            if (!keyW) keyW = true;
+            break;
+          case "KeyS":
+          case "ArrowDown":
+            if (!keyS) keyS = true;
+            break;
+          case "KeyD":
+          case "ArrowRight":
+            if (!keyD) keyD = true;
+            break;
+          case "Space":
+            snail.speak("Good morning!");
+            break;
+          case "KeyZ":
+            if (!keyZ) {
+              keyZ = true;
+              snail.speed = 20;
+              snail.speak("跑起來");
+            }
+            break;
+          default:
+            break;
+        }
+      }
+      function setKeyFalse(e) {
+        switch (e.code) {
+          case "KeyA":
+          case "ArrowLeft":
+            keyA = false;
+            break;
+          case "KeyW":
+          case "ArrowUp":
+            keyW = false;
+            break;
+          case "KeyS":
+          case "ArrowDown":
+            keyS = false;
+            break;
+          case "KeyD":
+          case "ArrowRight":
+            keyD = false;
+            break;
+          case "KeyZ":
+            keyZ = false;
+            snail.speed = 10;
+            break;
+          default:
+            break;
+        }
+      }
+
+      //根據按下的鍵對snail進行移動
+      function checkMove() {
+        if (snail != null) {
+          if (keyA && !keyD) {
+            snail.moveX(-snail.speed);
+          }
+          if (!keyA && keyD) {
+            snail.moveX(snail.speed);
+          }
+          if (keyW && !keyS) {
+            snail.moveY(-snail.speed);
+          }
+          if (!keyW && keyS) {
+            snail.moveY(snail.speed);
+          }
+        }
+      }
+
+      //產生隨機water
+      function radomWater() {
+        const div = document.createElement("div");
+        const img = document.createElement("img");
+        img.src =
+          "https://2.bp.blogspot.com/-sq7JgJF8z74/VJF-cgx9MHI/AAAAAAAAprQ/O5RHXm_J4NM/s400/bottle_water.png";
+        div.append(img);
+        div.classList.add("water");
+        div.style.left = Math.floor(Math.random() * 750) + "px";
+        div.style.top = Math.floor(Math.random() * 650) + "px";
+        space.prepend(div);
+        setTimeout(() => {
+          div.remove();
+        }, 6000);
+      }
+
+      function radomWater() {
+        const div = document.createElement("div");
+        const img = document.createElement("img");
+        img.src =
+          "https://2.bp.blogspot.com/-sq7JgJF8z74/VJF-cgx9MHI/AAAAAAAAprQ/O5RHXm_J4NM/s400/bottle_water.png";
+        div.append(img);
+        div.classList.add("water");
+        div.style.left = Math.floor(Math.random() * 750) + "px";
+        div.style.top = Math.floor(Math.random() * 650) + "px";
+        space.prepend(div);
+        setTimeout(() => {
+          div.remove();
+        }, 6000);
+      }
+
+      function saltObj() {
+        const div = document.createElement("div");
+        const img = document.createElement("img");
+        img.src =
+          "https://4.bp.blogspot.com/-cBkhcBcVRXg/U7O8PsHoT5I/AAAAAAAAicc/RFQyyU5gqV8/s400/salt.png";
+        div.append(img);
+        div.classList.add("salt");
+        const random = Math.floor(Math.random() * 4);
+        this.elem = div;
+        if (random == 0) {
+          this.x = -100;
+        } else if (random == 1) {
+          this.x = 850;
+        } else {
+          this.x = Math.floor(-100 + Math.random() * 850);
+        }
+        if (random == 2) {
+          this.y = -100;
+        } else if (random == 3) {
+          this.y = 750;
+        } else {
+          this.y = Math.floor(-100 + Math.random() * 750);
+        }
+        this.speedX =
+          this.x > 400
+            ? -Math.floor(5 + Math.random() * 10)
+            : Math.floor(5 + Math.random() * 10);
+        this.speedY =
+          this.y > 350
+            ? -Math.floor(5 + Math.random() * 10)
+            : Math.floor(5 + Math.random() * 10);
+        div.style.left = this.x + "px";
+        div.style.top = this.y + "px";
+        space.prepend(div);
+        this.move = () => {
+          this.y += this.speedY;
+          this.x += this.speedX;
+          this.elem.style.top = this.y + "px";
+          this.elem.style.left = this.x + "px";
+        };
+      }
+
+      function radomSalt() {
+        salts.push(new saltObj());
+      }
+
+      function saltsMove() {
+        if (salts.length > 0) {
+          for (const salt of salts) {
+            salt.move();
+          }
+        }
+      }
+      function saltsClear() {
+        if (salts.length > 0) {
+          let arr = [];
+          for (const i in salts) {
+            if (
+              salts[i].x > 850 ||
+              salts[i].x < -100 ||
+              salts[i].y > 750 ||
+              salts[i].y < -100
+            ) {
+              salts[i].elem.remove();
+              salts.splice(i, 1);
+            }
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
