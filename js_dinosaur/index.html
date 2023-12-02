@@ -1,1 +1,81 @@
-https://1.bp.blogspot.com/-GOUfyI4nytg/YHDkHtFvHnI/AAAAAAABdks/LKAQ65f4R5AbEJcrG3oMZBDANQ60Pq3TACNcBGAsYHQ/s450/dinosaur_ceratosaurus.png
+<!-- https://1.bp.blogspot.com/-GOUfyI4nytg/YHDkHtFvHnI/AAAAAAABdks/LKAQ65f4R5AbEJcrG3oMZBDANQ60Pq3TACNcBGAsYHQ/s450/dinosaur_ceratosaurus.png -->
+
+<!-- https://4.bp.blogspot.com/-LdfXwt1C2Cc/V2ubSxBsCoI/AAAAAAAA7nc/ZqY064xQc-MK18YW_hY1yyak2vlTcqDtwCLcB/s400/character_saboten.png -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小恐龍</title>
+    <style>
+      body {
+        background-color: rgb(140, 140, 140);
+      }
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      canvas {
+        background-color: rgb(235, 235, 235);
+        /* background-color: black; */
+      }
+      img {
+        width: 100px;
+      }
+      .img_box {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <canvas id="canvas" width="900" height="500"></canvas>
+      <div class="img_box">
+        <img
+          src="https://1.bp.blogspot.com/-GOUfyI4nytg/YHDkHtFvHnI/AAAAAAABdks/LKAQ65f4R5AbEJcrG3oMZBDANQ60Pq3TACNcBGAsYHQ/s450/dinosaur_ceratosaurus.png"
+          alt="dinosour"
+        />
+        <img
+          src="https://4.bp.blogspot.com/-LdfXwt1C2Cc/V2ubSxBsCoI/AAAAAAAA7nc/ZqY064xQc-MK18YW_hY1yyak2vlTcqDtwCLcB/s400/character_saboten.png"
+          alt="cactus"
+        />
+      </div>
+    </div>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      //線條粗細風格
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = "black";
+      //畫布基準座標
+      ctx.translate(0, 450);
+
+      //清空畫布
+      function clearCanvas() {
+        ctx.clearRect(0, -450, 900, 500);
+      }
+      //繪製地平線
+      function createLand() {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(900, 0);
+        ctx.stroke();
+      }
+
+      function Dinosour() {
+        this.x = 30;
+        this.y = 0;
+        this.height = 100;
+        this.width = 100;
+        this.actionType = "walking";
+        this.hitbox_w = 0.75 * this.width;
+        this.hitbox_h = 0.75 * this.height;
+        this.img = document.querySelector("#dinosour");
+        this.acion = function () {};
+        this.jump = function () {};
+      }
+    </script>
+  </body>
+</html>
