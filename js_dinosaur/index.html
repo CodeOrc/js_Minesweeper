@@ -32,12 +32,15 @@
   <body>
     <div class="container">
       <canvas id="canvas" width="900" height="500"></canvas>
+
       <div class="img_box">
         <img
+          id="dinosaur"
           src="https://1.bp.blogspot.com/-GOUfyI4nytg/YHDkHtFvHnI/AAAAAAABdks/LKAQ65f4R5AbEJcrG3oMZBDANQ60Pq3TACNcBGAsYHQ/s450/dinosaur_ceratosaurus.png"
-          alt="dinosour"
+          alt="dinosaur"
         />
         <img
+          id="cactus"
           src="https://4.bp.blogspot.com/-LdfXwt1C2Cc/V2ubSxBsCoI/AAAAAAAA7nc/ZqY064xQc-MK18YW_hY1yyak2vlTcqDtwCLcB/s400/character_saboten.png"
           alt="cactus"
         />
@@ -46,6 +49,9 @@
     <script>
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
+      const dinosaur = new Dinosaur();
+      const jumpCheck = pressSpace(dinosaur.jump);
+
       //線條粗細風格
       ctx.lineWidth = 5;
       ctx.strokeStyle = "black";
@@ -57,14 +63,90 @@
         ctx.clearRect(0, -450, 900, 500);
       }
       //繪製地平線
-      function createLand() {
+      function drawLand() {
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(900, 0);
         ctx.stroke();
       }
 
-      function Dinosour() {
+      //繪製dinosaur
+      function drawDinosaur() {
+        ctx.drawImage(
+          dinosaur.img,
+          dinosaur.x,
+          dinosaur.y - dinosaur.height,
+          100,
+          100
+        );
+      }
+
+      //繪製停止畫面
+      function drawStopScreen() {
+        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.fillRect(0, -450, 900, 500);
+        ctx.fill();
+      }
+
+      //toggle game start
+      function toggleStart(update, reset) {
+        let gamestart = false;
+        let gameUpgate = null;
+        return {
+          start: function () {
+            gamestart = true;
+            if (gameUpgate == null) {
+              gameUpgate = setInterval(update, 100);
+            }
+          },
+          stop: function () {
+            gamestart = false;
+            clearInterval(update);
+            reset();
+          },
+        };
+      }
+      let start = toggleStart(update, () => {
+        console.log(reset);
+      });
+      canvas.addEventListener("click", start.start);
+      //update
+      function update() {
+        jumpCheck();
+        clearCanvas();
+        drawLand();
+        dinosaur.action();
+        drawDinosaur();
+      }
+
+      //key press event
+      function pressSpace() {
+        let keySpace = false;
+        const body = document.querySelector("body");
+        body.addEventListener("keydown", function (e) {
+          if (e.code == "Space") {
+            if (!keySpace) {
+              keySpace = true;
+            }
+          }
+        });
+
+        body.addEventListener("keyup", function (e) {
+          if (e.code == "Space") {
+            keySpace = false;
+          }
+        });
+        return function () {
+          if (keySpace) {
+            dinosaur.jump();
+          } else {
+            dinosaur.stopJump();
+          }
+        };
+      }
+
+      //dinosaur物件
+      function Dinosaur() {
         this.x = 30;
         this.y = 0;
         this.height = 100;
@@ -72,9 +154,40 @@
         this.actionType = "walking";
         this.hitbox_w = 0.75 * this.width;
         this.hitbox_h = 0.75 * this.height;
-        this.img = document.querySelector("#dinosour");
-        this.acion = function () {};
-        this.jump = function () {};
+        this.img = document.querySelector("#dinosaur");
+        this.action = function () {
+          switch (this.actionType) {
+            case "jumping":
+              if (this.y > -120) {
+                this.y -= 15;
+              } else {
+                this.y = -150;
+                this.actionType = "falling";
+              }
+              break;
+            case "falling":
+              if (this.y < 0) {
+                this.y += 15;
+              } else {
+                this.y = 0;
+                this.actionType = "walking";
+              }
+              break;
+            case "walking":
+            default:
+              break;
+          }
+        };
+        this.jump = function () {
+          if (this.actionType == "walking" && this.y == 0) {
+            this.actionType = "jumping";
+          }
+        };
+        this.stopJump = function () {
+          if (this.actionType == "jumping" && this.y < 0) {
+            this.actionType = "falling";
+          }
+        };
       }
     </script>
   </body>
