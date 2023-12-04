@@ -21,8 +21,15 @@
         background-color: rgb(235, 235, 235);
         /* background-color: black; */
       }
+      .tip {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: 900;
+      }
       img {
         width: 100px;
+        display: none;
       }
       .img_box {
         display: flex;
@@ -32,7 +39,7 @@
   <body>
     <div class="container">
       <canvas id="canvas" width="900" height="500"></canvas>
-
+      <div class="tip">Press "Space" to jump</div>
       <div class="img_box">
         <img
           id="dinosaur"
@@ -53,10 +60,15 @@
       const jumpCheck = pressSpace(dinosaur.jump);
 
       //線條粗細風格
-      ctx.lineWidth = 5;
+      ctx.lineWidth = 3;
       ctx.strokeStyle = "black";
       //畫布基準座標
       ctx.translate(0, 450);
+
+      //起始繪製
+      drawLand();
+      drawDinosaur();
+      drawStopScreen();
 
       //清空畫布
       function clearCanvas() {
@@ -86,6 +98,10 @@
         ctx.fillStyle = "rgba(0,0,0,0.5)";
         ctx.fillRect(0, -450, 900, 500);
         ctx.fill();
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.font = "30px Comic Sans MS";
+        ctx.fillText("click to start", 450, -200);
       }
 
       //toggle game start
