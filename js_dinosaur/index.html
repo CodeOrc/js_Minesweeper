@@ -29,7 +29,7 @@
       }
       img {
         width: 100px;
-        display: none;
+        /* display: none; */
       }
       .img_box {
         display: flex;
@@ -58,6 +58,12 @@
       const ctx = canvas.getContext("2d");
       const dinosaur = new Dinosaur();
       const jumpCheck = pressSpace(dinosaur.jump);
+      const cactusUpdate = cactusList();
+      const start = toggleStart(update, () => {
+        console.log(reset);
+      });
+
+      canvas.addEventListener("click", start.start);
 
       //線條粗細風格
       ctx.lineWidth = 3;
@@ -93,6 +99,19 @@
         );
       }
 
+      //繪製仙人掌
+      function drawCactus(list) {
+        for (const item of list) {
+          ctx.drawImage(
+            item.img,
+            item.x,
+            item.y - item.height,
+            item.width,
+            item.height
+          );
+        }
+      }
+
       //繪製停止畫面
       function drawStopScreen() {
         ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -122,17 +141,15 @@
           },
         };
       }
-      let start = toggleStart(update, () => {
-        console.log(reset);
-      });
-      canvas.addEventListener("click", start.start);
-      //update
+
+      //update所有需求
       function update() {
         jumpCheck();
         clearCanvas();
         drawLand();
         dinosaur.action();
         drawDinosaur();
+        drawCactus(cactusUpdate());
       }
 
       //key press event
@@ -203,6 +220,43 @@
           if (this.actionType == "jumping" && this.y < 0) {
             this.actionType = "falling";
           }
+        };
+      }
+
+      //cactus物件
+      function Cactus(r, size) {
+        this.x = 1000 + r;
+        this.y = 0;
+        this.height = 40 * size;
+        this.width = 40 * size;
+        this.hitbox_w = 0.5 * this.width;
+        this.hitbox_h = 0.8 * this.height;
+        this.img = document.querySelector("#cactus");
+      }
+      //cactus列表及更新位置
+      function cactusList() {
+        const spawnRate = 20;
+        let spawnCount = 10;
+        let list = [];
+
+        return function () {
+          spawnCount++;
+          if (spawnCount >= spawnRate) {
+            spawnCount = 0;
+            list.push(
+              new Cactus(
+                Math.floor(Math.random() * 100) - 50,
+                Math.floor(Math.random() * 5) * 0.1 + 1
+              )
+            );
+          }
+          for (let cactus of list) {
+            cactus.x -= 20;
+          }
+          if (list[0].x < -100) {
+            list.shift();
+          }
+          return list;
         };
       }
     </script>
